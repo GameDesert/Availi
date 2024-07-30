@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/GameDesert/Availi#readme",
   "dependencies": {
-    "sqlite3": "^5.1.7"
+    "short-uuid": "^5.2.0",
+    "sqlite3": "^5.1.7",
+    "uuid": "^10.0.0"
   }
 }

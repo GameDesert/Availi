@@ -23,6 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 */
 
 const sqlite3 = require('sqlite3').verbose();
+const uuid = require('uuid');
+const short = require('short-uuid');
 
 const db = new sqlite3.Database('./availabilities.db', (err) => {
     if (err) {
@@ -63,8 +65,13 @@ function createNewDB() {
     });
 }
 
-function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 1_209_600)
-{
+const readableUUIDTranslator = short(short.constants.flickrBase58);
+function createShortUUID() {
+    return readableUUIDTranslator.new();
+}
+
+function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 1_209_600) {
+    const id = uuid.v4();
     const sql = `INSERT INTO events (id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     db.run(sql, [id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime], (err) => {
         if (err) {
@@ -75,4 +82,5 @@ function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl
     });
 }
 
-createNewDB()
+console.log(createShortUUID().length);
+console.log(short.constants.flickrBase58);
