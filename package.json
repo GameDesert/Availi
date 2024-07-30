@@ -1,0 +1,22 @@
+{
+  "name": "availi",
+  "version": "1.0.0",
+  "description": "Poll-based availability aggregator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GameDesert/Availi.git"
+  },
+  "author": "GameDesert",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/GameDesert/Availi/issues"
+  },
+  "homepage": "https://github.com/GameDesert/Availi#readme",
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  }
+}
