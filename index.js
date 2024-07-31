@@ -46,7 +46,7 @@ const db = new sqlite3.Database("./availabilities.db", (err) => {
   }
 });
 
-app.use(express.static('static'));
+// #region Express
 
 app.use(express.json());
 
@@ -54,20 +54,33 @@ app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-app.post('/createEvent', async (req, res) => {
+app.post('/api', async (req, res) => {
   const { desc, firstDay, lastDay, startTime, endTime } = req.body;
-  res.send(await createNewEvent(desc, firstDay, lastDay, startTime, endTime));
+  await createNewEvent(res, desc, firstDay, lastDay, startTime, endTime);
 });
 
-app.put('/blockDate', (req, res) => {
-  const { eventid, date, status, user } = req.body;
-  res.send(blockOutDate(eventid, date, status, user));
+app.put('/api', (req, res) => {
+  const { id, date, status, user } = req.body;
+  res.send(blockOutDate(id, date, status, user));
 });
 
-app.delete('/deleteall', (req, res) => {
-  deleteAllEvents();
-  res.send("PURGED");
+app.delete('/api', (req, res) => {
+  const { id, pin } = req.body;
+  deleteEvent(res, id, pin);
 });
+
+app.delete('/api/all', (req, res) => {
+  deleteAllEvents(res);
+});
+
+app.get('/api', (req, res) => {
+  const { id } = req.body;
+  getEvent(res, id);
+});
+
+app.use(express.static('static'));
+
+// #endregion
 
 function createNewDB() {
   db.serialize(() => {
@@ -136,6 +149,7 @@ function selectRandomWords(filePath, count) {
 }
 
 async function createNewEvent(
+  res,
   desc,
   firstDay,
   lastDay,
@@ -145,14 +159,21 @@ async function createNewEvent(
 ) {
   const randwords = await selectRandomWords("wordlist.txt", 3).catch((err) => {
     console.error("Error selecting random words", err);
+    res.status(500).send("Error generating eventid. Description of error follows:\n" + err);
+    
   });
 
-  const id = randwords.join("-");
-
-  const key = Math.floor(Math.random() * 9000) + 1000;
-  const creationTime = Math.floor(Date.now() / 1000);
-  const participants = "{}";
-  const dates = JSON.stringify(populateDates(firstDay, lastDay));
+  let id, key, creationTime, participants, dates;
+  try {
+    id = randwords.join("-");
+    key = Math.floor(Math.random() * 9000) + 1000;
+    creationTime = Math.floor(Date.now() / 1000);
+    participants = "{}";
+    dates = JSON.stringify(populateDates(firstDay, lastDay));
+  } catch (err) {
+    console.error("Error assigning variables", err);
+    res.status(500).send("Error populating data fields for new event. Description of error follows:\n" + err);
+  }
 
   db.serialize(() => {
     db.run("BEGIN TRANSACTION");
@@ -160,15 +181,34 @@ async function createNewEvent(
     db.run(sql, [id, desc, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime], (err) => {
       if (err) {
         console.error('Error inserting new event', err);
+        res.status(500).send("Error creating new event. Description of error follows:\n" + err);
         db.run("ROLLBACK");
       } else {
         db.run("COMMIT");
         console.log('New event added successfully');
+        res.status(201).send({ "desc": desc, "id": id, "key": key });
       }
     });
   });
+  return true;
+}
 
-  return { "desc": desc, "id": id, "key": key };
+function getEvent(res, eventid) {
+  db.get(
+    `SELECT id, desc, firstDay, lastDay, startTime, endTime, dates, participants, creationTime FROM events WHERE id = ?`,
+    [eventid],
+    (err, row) => {
+      if (err) {
+        console.error("Error retrieving event from database", err);
+        res.status(500).send("Error retrieving event. Description of error follows:\n" + err);
+      } else if (!row) {
+        res.status(404).send(`Event ${eventid} not found`);
+      } else {
+        const { id, desc, firstDay, lastDay, startTime, endTime, dates, participants, creationTime } = row;
+        res.status(200).send({ id, desc, firstDay, lastDay, startTime, endTime, dates, participants, creationTime });
+      }
+    }
+  );
 }
 
 // Function to populate the dates dictionary with the days between the first and last day of the event (inclusive), with array for responded users and tentative users.
@@ -277,7 +317,9 @@ function backupDatabase() {
 }
 
 // Set an interval to back up the database every hour
-setInterval(backupDatabase, 3600000); // 3600000 ms = 1 hour
+setInterval(backupDatabase, 3_600_000); // 3600000 ms = 1 hour
+// Set an interval to purge the database every 6 hours
+setInterval(deleteExpiredEvents, 21_600_000); // 3600000 ms = 1 hour, 21600000 ms = 6 hours
 
 function deleteExpiredEvents() {
   const currentTime = Math.floor(Date.now() / 1000);
@@ -292,38 +334,49 @@ function deleteExpiredEvents() {
   });
 }
 
-function deleteAllEvents() {
+function deleteAllEvents(res) {
   const sql = `DELETE FROM events`;
 
   db.run(sql, (err) => {
     if (err) {
       console.error("Error deleting all events", err);
+      res.status(500).send("Error deleting all events. Description of error follows:\n" + err);
     } else {
       console.log("All events deleted successfully");
+      res.status(200).send("Successfully Deleted All Events");
     }
   });
 }
 
-function deleteEvent(eventid, pin) {
+function deleteEvent(res, eventid, pin) {
   db.serialize(() => {
     db.run("BEGIN TRANSACTION");
     db.get(`SELECT key FROM events WHERE id = ?`, [eventid], (err, row) => {
       if (err) {
         console.error("Error retrieving event key from database", err);
+        res.status(404).send(`Error retrieving event ${eventid} for deletion. Description of error follows:\n` + err);
         db.run("ROLLBACK");
       } else {
         if (row.key === pin) {
           db.run(`DELETE FROM events WHERE id = ?`, [eventid], (err) => {
             if (err) {
               console.error("Error deleting event from database", err);
+              res.status(500).send(`Error deleting event ${eventid}. Description of error follows:\n` + err);
               db.run("ROLLBACK");
             } else {
               db.run("COMMIT");
               console.log("Event deleted successfully");
+              res.status(200).send(`Successfully Deleted ${eventid}`);
             }
           });
         } else {
-          console.error("Incorrect pin");
+          if (pin != "") {
+            console.error("Incorrect pin");
+            res.status(403).send(`Error deleting event ${eventid}, incorrect pin provided. Description of error follows:\n` + err);
+          } else {
+            console.error("No pin");
+            res.status(401).send(`Error deleting event ${eventid}, no pin provided. Description of error follows:\n` + err);
+          }
           db.run("ROLLBACK");
         }
       }
