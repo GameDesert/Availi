@@ -104,7 +104,7 @@ function selectRandomWords(filePath, count) {
     });
 }
 
-async function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 1_209_600) {
+async function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 20) {
     const randwords = await selectRandomWords('wordlist.txt', 3)
     .catch((err) => {
         console.error('Error selecting random words', err);
@@ -217,6 +217,46 @@ function blockOutDate(eventid, date, status, user) {
     });
 }
 
+function deleteExpiredEvents() {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const sql = `DELETE FROM events WHERE creationTime + ttl < ?`;
+
+    db.run(sql, [currentTime], (err) => {
+        if (err) {
+            console.error('Error deleting expired events', err);
+        } else {
+            console.log('Expired events deleted successfully');
+        }
+    });
+
+    db.close((err) => {
+        if (err) {
+            console.error('Error closing database', err);
+        } else {
+            console.log('Database connection closed');
+        }
+    });
+}
+
+function deleteAllEvents() {
+    const sql = `DELETE FROM events`;
+
+    db.run(sql, (err) => {
+        if (err) {
+            console.error('Error deleting all events', err);
+        } else {
+            console.log('All events deleted successfully');
+        }
+    });
+
+    db.close((err) => {
+        if (err) {
+            console.error('Error closing database', err);
+        } else {
+            console.log('Database connection closed');
+        }
+    });
+}
 
 // Usage example
 // selectRandomWords('wordlist.txt', 3)
@@ -228,8 +268,10 @@ function blockOutDate(eventid, date, status, user) {
 //     });
 
 // createNewDB();
-// createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 1_209_600);
+// createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 30);
 
 // console.log(populateDates("2024-01-05", "2024-01-05"));
 
-blockOutDate("chop-coach-blimp", "2024-01-01", "block", "steveeeen");
+// blockOutDate("chop-coach-blimp", "2024-01-01", "block", "steveeeen");
+
+deleteExpiredEvents();
