@@ -1,0 +1,73 @@
+:root {
+    --primary-dark: #013440;
+    --primary-light: #035E73;
+    --bg: #f2f2f2;
+    --secondary: #F2A922;
+
+    --block-out: #ff2a2a;
+    --block-in: #ff8080;
+    --tent-out: #ffcc00;
+    --tent-in: #ffdd55;
+    --free-out: #55d400;
+    --free-in: #7fff2a;
+    --blank-out: #999999;
+    --blank-in: #b3b3b3;
+    --final-out: #0088aa;
+    --final-in: #00aad4;
+}
+
+.date {
+    box-sizing: border-box;
+    background-color: red;
+    width: 64px;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+
+    border-radius: 18px;
+}
+.date > svg {
+    width: 70%;
+    height: 70%;
+}
+
+/* #region Individual Block Styles */
+.date.block {
+    border: 4px solid var(--block-out);
+    background-color: var(--block-in);
+    fill: var(--block-out);
+}
+
+.date.tentative {
+    border: 4px solid var(--tent-out);
+    background-color: var(--tent-in);
+    fill: var(--tent-out);
+}
+
+.date.free {
+    border: 4px solid var(--free-out);
+    background-color: var(--free-in);
+    fill: var(--free-out);
+}
+
+.date.disabled {
+    border: 4px solid var(--blank-out);
+    background-color: var(--blank-in);
+    fill: var(--blank-out);
+}
+
+.date.unselected {
+    border: 4px dashed var(--blank-out);
+    background-color: var(--blank-in);
+    fill: var(--blank-out);
+}
+
+.date.final {
+    border: 4px solid var(--final-out);
+    background-color: var(--final-in);
+    fill: var(--final-out);
+}
+/* #endregion */
