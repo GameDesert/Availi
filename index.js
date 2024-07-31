@@ -22,6 +22,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 - Everyone can see what days have already been objected to, what days are tentative, and what days are free.
 */
 
+/* TODO:
+
+- If admin sets a time, verify that it is in a 30-min interval server-side (or 15-min, or 5-min, or whatever) (ALSO DON'T FORGET TIMEZONES)
+- For a user, save their username as a cookie to log back in later. (And a note that says "please remember your username to amend your vote later")
+- For each user, a unique avatar is generated based on their username. (This is to prevent impersonation, and also to make the site more fun)
+*/
+
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const readline = require('readline');
@@ -107,7 +114,7 @@ async function createNewEvent(firstDay, lastDay, startTime = null, endTime = nul
 
     const key = Math.floor(Math.random() * 9000) + 1000;
     const creationTime = Math.floor(Date.now() / 1000);
-    const participants = "[]";
+    const participants = "{}";
     const dates = "{}";
 
     const sql = `INSERT INTO events (id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -128,6 +135,39 @@ async function createNewEvent(firstDay, lastDay, startTime = null, endTime = nul
     });
 }
 
+// Function to populate the dates dictionary with the days between the first and last day of the event (inclusive), with array for responded users and tentative users.
+/* EXAMPLE:
+
+"2024-01-01": {
+    "state": "blocked | tentative | free",
+    "blockers": ["user1", "user2"],
+    "tentative": ["user3"]
+
+*/
+
+function populateDates(firstDay, lastDay) {
+    if (new Date(firstDay) > new Date(lastDay)) {
+        throw new Error('Invalid date range: first day occurs after last day');
+    }
+
+    const dates = {};
+    const date = new Date(firstDay);
+    const lastDate = new Date(lastDay);
+
+    while (date <= lastDate) {
+        const dateString = date.toISOString().split('T')[0];
+        dates[dateString] = {
+            state: 'free',
+            blockers: [],
+            tentative: []
+        };
+
+        date.setDate(date.getDate() + 1);
+    }
+
+    return dates;
+}
+
 
 // Usage example
 // selectRandomWords('wordlist.txt', 3)
@@ -139,4 +179,6 @@ async function createNewEvent(firstDay, lastDay, startTime = null, endTime = nul
 //     });
 
 // createNewDB();
-createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 1_209_600);
+// createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 1_209_600);
+
+console.log(populateDates("2024-01-05", "2024-01-05"));
