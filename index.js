@@ -1,3 +1,5 @@
+/* Assisted by GitHub Copilot via GitHub Student Program */
+
 /* Availi - Poll-based availability aggregator. 
 Copyright (C) 2024  GameDesert
 
