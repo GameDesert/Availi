@@ -59,6 +59,11 @@ app.post('/createEvent', async (req, res) => {
   res.send(await createNewEvent(desc, firstDay, lastDay, startTime, endTime));
 });
 
+app.put('/blockDate', (req, res) => {
+  const { eventid, date, status, user } = req.body;
+  res.send(blockOutDate(eventid, date, status, user));
+});
+
 app.delete('/deleteall', (req, res) => {
   deleteAllEvents();
   res.send("PURGED");
@@ -199,6 +204,8 @@ function populateDates(firstDay, lastDay) {
 }
 
 function blockOutDate(eventid, date, status, user) {
+  let updatedDates = {};
+  let updatedUsers = {};
   db.get(
     `SELECT dates, participants FROM events WHERE id = ?`,
     [eventid],
@@ -210,26 +217,26 @@ function blockOutDate(eventid, date, status, user) {
         // Do some work on the dates JSON object
 
         if (status === "free") {
-          // Remove user from both array b and array t
-          Object.values(dates).forEach((date) => {
-            date.b = date.b.filter((user) => user !== user);
-            date.t = date.t.filter((user) => user !== user);
-          });
+          // Remove user from both array b and array t for the given date
+          if (dates.hasOwnProperty(date)) {
+            dates[date].b = dates[date].b.filter((u) => u !== user);
+            dates[date].t = dates[date].t.filter((u) => u !== user);
+          }
         } else if (status === "tentative") {
-          // Remove user from array b and append to array t
-          Object.values(dates).forEach((date) => {
-            date.b = date.b.filter((user) => user !== user);
-            date.t.push(user);
-          });
+          // Remove user from array b and append to array t for the given date
+          if (dates.hasOwnProperty(date)) {
+            dates[date].b = dates[date].b.filter((u) => u !== user);
+            dates[date].t.push(user);
+          }
         } else if (status === "block") {
-          // Remove user from array t and add to array b
-          Object.values(dates).forEach((date) => {
-            date.t = date.t.filter((user) => user !== user);
-            date.b.push(user);
-          });
+          // Remove user from array t and add to array b for the given date
+          if (dates.hasOwnProperty(date)) {
+            dates[date].t = dates[date].t.filter((u) => u !== user);
+            dates[date].b.push(user);
+          }
         }
 
-        const updatedDates = JSON.stringify(dates);
+        updatedDates = JSON.stringify(dates);
 
         // Check if the user already exists in the dictionary
         const users = JSON.parse(row.participants);
@@ -239,7 +246,7 @@ function blockOutDate(eventid, date, status, user) {
         }
 
         // Update the record with the new users dictionary
-        const updatedUsers = JSON.stringify(users);
+        updatedUsers = JSON.stringify(users);
         db.run(
           `UPDATE events SET dates = ?, participants = ? WHERE id = ?`,
           [updatedDates, updatedUsers, eventid],
@@ -254,6 +261,7 @@ function blockOutDate(eventid, date, status, user) {
       }
     }
   );
+  return eventid, date, status, user, updatedUsers, updatedDates;
 }
 
 // Function to back up the database periodically
