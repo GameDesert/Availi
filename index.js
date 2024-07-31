@@ -258,6 +258,26 @@ function deleteAllEvents() {
     });
 }
 
+function deleteEvent(eventid, pin) {
+    db.get(`SELECT key FROM events WHERE id = ?`, [eventid], (err, row) => {
+        if (err) {
+            console.error('Error retrieving event key from database', err);
+        } else {
+            if (row.key === pin) {
+                db.run(`DELETE FROM events WHERE id = ?`, [eventid], (err) => {
+                    if (err) {
+                        console.error('Error deleting event from database', err);
+                    } else {
+                        console.log('Event deleted successfully');
+                    }
+                });
+            } else {
+                console.error('Incorrect pin');
+            }
+        }
+    });
+}
+
 // Usage example
 // selectRandomWords('wordlist.txt', 3)
 //     .then((randomWords) => {
@@ -274,4 +294,6 @@ function deleteAllEvents() {
 
 // blockOutDate("chop-coach-blimp", "2024-01-01", "block", "steveeeen");
 
-deleteExpiredEvents();
+// deleteEvent("roast-riot-spur", "7593");
+
+deleteAllEvents();
