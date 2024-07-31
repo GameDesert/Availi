@@ -115,7 +115,7 @@ async function createNewEvent(firstDay, lastDay, startTime = null, endTime = nul
     const key = Math.floor(Math.random() * 9000) + 1000;
     const creationTime = Math.floor(Date.now() / 1000);
     const participants = "{}";
-    const dates = "{}";
+    const dates = JSON.stringify(populateDates(firstDay, lastDay));
 
     const sql = `INSERT INTO events (id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     db.run(sql, [id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime], (err) => {
@@ -139,11 +139,11 @@ async function createNewEvent(firstDay, lastDay, startTime = null, endTime = nul
 /* EXAMPLE:
 
 "2024-01-01": {
-    "state": "blocked | tentative | free",
     "blockers": ["user1", "user2"],
     "tentative": ["user3"]
 
 */
+/* Removed STATE variable, because state can be inferred client-side from absence or presence of users in given arrays. Having the variable would make it difficult to accurately update the state if a user withdraws their block/tentativity*/
 
 function populateDates(firstDay, lastDay) {
     if (new Date(firstDay) > new Date(lastDay)) {
@@ -157,15 +157,64 @@ function populateDates(firstDay, lastDay) {
     while (date <= lastDate) {
         const dateString = date.toISOString().split('T')[0];
         dates[dateString] = {
-            state: 'free',
-            blockers: [],
-            tentative: []
+            b: [],
+            t: []
         };
 
         date.setDate(date.getDate() + 1);
     }
 
     return dates;
+}
+
+function blockOutDate(eventid, date, status, user) {
+    db.get(`SELECT dates, participants FROM events WHERE id = ?`, [eventid], (err, row) => {
+        if (err) {
+            console.error('Error retrieving dates from database', err);
+        } else {
+            const dates = JSON.parse(row.dates);
+            // Do some work on the dates JSON object
+
+            if (status === "free") {
+                // Remove user from both array b and array t
+                Object.values(dates).forEach((date) => {
+                    date.b = date.b.filter((user) => user !== user);
+                    date.t = date.t.filter((user) => user !== user);
+                });
+            } else if (status === "tentative") {
+                // Remove user from array b and append to array t
+                Object.values(dates).forEach((date) => {
+                    date.b = date.b.filter((user) => user !== user);
+                    date.t.push(user);
+                });
+            } else if (status === "block") {
+                // Remove user from array t and add to array b
+                Object.values(dates).forEach((date) => {
+                    date.t = date.t.filter((user) => user !== user);
+                    date.b.push(user);
+                });
+            }
+
+            const updatedDates = JSON.stringify(dates);
+
+            // Check if the user already exists in the dictionary
+            const users = JSON.parse(row.participants);
+            if (!users.hasOwnProperty(user)) {
+                // Add the new user to the dictionary
+                users[user] = {"avatar": "#97a8ef"}; // Placeholder avatar color, generate random
+            }
+
+            // Update the record with the new users dictionary
+            const updatedUsers = JSON.stringify(users);
+            db.run(`UPDATE events SET dates = ?, participants = ? WHERE id = ?`, [updatedDates, updatedUsers, eventid], (err) => {
+                if (err) {
+                    console.error('Error updating users in database', err);
+                } else {
+                    console.log('Users updated successfully');
+                }
+            });
+        }
+    });
 }
 
 
@@ -181,4 +230,6 @@ function populateDates(firstDay, lastDay) {
 // createNewDB();
 // createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 1_209_600);
 
-console.log(populateDates("2024-01-05", "2024-01-05"));
+// console.log(populateDates("2024-01-05", "2024-01-05"));
+
+blockOutDate("chop-coach-blimp", "2024-01-01", "block", "steveeeen");
