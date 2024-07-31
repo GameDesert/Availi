@@ -23,8 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 */
 
 const sqlite3 = require('sqlite3').verbose();
-const uuid = require('uuid');
-const short = require('short-uuid');
+const fs = require('fs');
+const readline = require('readline');
 
 const db = new sqlite3.Database('./availabilities.db', (err) => {
     if (err) {
@@ -40,8 +40,8 @@ function createNewDB() {
             id TEXT PRIMARY KEY,
             firstDay TEXT NOT NULL,
             lastDay TEXT NOT NULL,
-            startTime TEXT NOT NULL,
-            endTime TEXT NOT NULL,
+            startTime TEXT,
+            endTime TEXT,
             dates TEXT NOT NULL,
             key TEXT NOT NULL,
             participants TEXT NOT NULL,
@@ -65,13 +65,51 @@ function createNewDB() {
     });
 }
 
-const readableUUIDTranslator = short(short.constants.flickrBase58);
-function createShortUUID() {
-    return readableUUIDTranslator.new();
+
+function selectRandomWords(filePath, count) {
+    return new Promise((resolve, reject) => {
+        const words = [];
+        const stream = fs.createReadStream(filePath);
+        const rl = readline.createInterface({
+            input: stream,
+            crlfDelay: Infinity
+        });
+
+        rl.on('line', (line) => {
+            words.push(line);
+        });
+
+        rl.on('close', () => {
+            const randomWords = [];
+            const totalWords = words.length;
+
+            for (let i = 0; i < count; i++) {
+                const randomIndex = Math.floor(Math.random() * totalWords);
+                randomWords.push(words[randomIndex]);
+            }
+
+            resolve(randomWords);
+        });
+
+        stream.on('error', (err) => {
+            reject(err);
+        });
+    });
 }
 
-function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 1_209_600) {
-    const id = uuid.v4();
+async function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl = 1_209_600) {
+    const randwords = await selectRandomWords('wordlist.txt', 3)
+    .catch((err) => {
+        console.error('Error selecting random words', err);
+    });
+
+    const id = randwords.join('-');
+
+    const key = Math.floor(Math.random() * 9000) + 1000;
+    const creationTime = Math.floor(Date.now() / 1000);
+    const participants = "[]";
+    const dates = "{}";
+
     const sql = `INSERT INTO events (id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     db.run(sql, [id, firstDay, lastDay, startTime, endTime, dates, key, participants, ttl, creationTime], (err) => {
         if (err) {
@@ -80,7 +118,25 @@ function createNewEvent(firstDay, lastDay, startTime = null, endTime = null, ttl
             console.log('New event added successfully');
         }
     });
+
+    db.close((err) => {
+        if (err) {
+            console.error('Error closing database', err);
+        } else {
+            console.log('Database connection closed');
+        }
+    });
 }
 
-console.log(createShortUUID().length);
-console.log(short.constants.flickrBase58);
+
+// Usage example
+// selectRandomWords('wordlist.txt', 3)
+//     .then((randomWords) => {
+//         console.log(randomWords);
+//     })
+//     .catch((err) => {
+//         console.error('Error selecting random words', err);
+//     });
+
+// createNewDB();
+createNewEvent("2024-01-01", "2024-01-05", startTime = null, endTime = null, ttl = 1_209_600);
