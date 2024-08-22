@@ -197,8 +197,63 @@
             for (let i = 0; i < eventBlocks.length; i++) {
                 eventBlocks[i].addEventListener('click', function() {
                     console.log(eventBlocks[i].id);
+                    change_stat(eventBlocks[i].id, id);
                 });
             };
+            
+        }
+
+        function call_change(id, date, status, user) {
+            const url = 'http://localhost:3000/api';
+            const data = {
+                date: date,
+                status: status,
+                id: id,
+                user: user
+            };
+
+            const request = new XMLHttpRequest();
+            request.open('PUT', url, true);
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function() {
+                if (request.readyState === 4) {
+                    if (request.status === 200) {
+                        console.log('Change request successful');
+                    } else {
+                        console.log('Change request failed');
+                    }
+                }
+            };
+
+            request.send(JSON.stringify(data));
+        }
+
+        function change_stat(id, eventid) {
+            block = document.getElementById(id)
+
+            switch (block.querySelector("div").className) {
+                case "date free":
+                    call_change(eventid, id, "tentative", username);
+                    block.querySelector("div").className = "date tentative";
+                    block.querySelector("div").innerHTML = block.querySelector("div").innerHTML = vectors.tentative;
+                    break;
+                
+                case "date tentative":
+                    call_change(eventid, id, "block", username);
+                    block.querySelector("div").className = "date block";
+                    block.querySelector("div").innerHTML = block.querySelector("div").innerHTML = vectors.block;
+                    break;
+            
+                case "date block":
+                    call_change(eventid, id, "free", username);
+                    block.querySelector("div").className = "date free";
+                    block.querySelector("div").innerHTML = block.querySelector("div").innerHTML = vectors.free;
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         function main() {
