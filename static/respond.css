@@ -5,7 +5,7 @@
 .squares {
     margin-top: 32px;
 
-    background-color: aqua;
+    background-color: none;
     width: fit-content;
     max-width: calc((64px + 12px) * 7);
     margin-left: auto;
@@ -61,4 +61,35 @@
     background-color: rgba(255, 255, 255, 0.75);
     border-radius: 12px;
     border: 2px solid rgba(156, 156, 156, 0.5);
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    padding: 8px;
+}
+
+header span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 8px;
+
+}
+
+header span p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 100;
+    font-size: 16px;
+}
+
+header span h1 {
+    font-weight: 700;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 24px;
 }
