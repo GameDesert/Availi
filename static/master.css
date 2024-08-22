@@ -76,3 +76,13 @@
     width: 86px;
     height: auto;
 }
+
+header {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    padding: 8px;
+}
