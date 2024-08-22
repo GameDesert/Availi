@@ -104,17 +104,22 @@
         date_template = `<div class="eventblock"><p class="daytext">{DAY}</p><div class="date {TYPE CLASS}">{VECTOR}</div></div>`
 
         function formatDate(date) {
-            const options = { day: 'numeric', month: 'short' };
-            const [year, month, day] = date.split('-');
-            const formattedDate = new Date(year, month - 1, day).toLocaleDateString('en-US', options);
-            return formattedDate.replace('.', '');
+            const day = new Date(date);
+
+            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+            const month = monthNames[day.getMonth()];
+
+            const daynum = day.getDate();
+
+            return `${daynum} ${month}`;
         }
 
         function addSquare(day, type_name) {
             const element = date_template.replace("{TYPE CLASS}", type_name).replace("{VECTOR}", vectors[type_name]).replace("{DAY}", formatDate(day));
 
             const cal = document.getElementById('calendar');
-            cal.innerHTML += htmlText;
+            cal.innerHTML += element;
         }
     </script>
 </body>
