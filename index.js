@@ -56,6 +56,13 @@ app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
+app.options('/api', (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.end();
+});
+
 app.post('/api', async (req, res) => {
   const { desc, firstDay, lastDay, startTime, endTime } = req.body;
   await createNewEvent(res, desc, firstDay, lastDay, startTime, endTime);
@@ -76,7 +83,7 @@ app.delete('/api/all', (req, res) => {
 });
 
 app.get('/api', (req, res) => {
-  const { id } = req.body;
+  const id = req.query.id || req.body.id;
   getEvent(res, id);
 });
 
@@ -196,6 +203,9 @@ async function createNewEvent(
 }
 
 function getEvent(res, eventid) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader("Access-Control-Allow-Headers", "*");
   db.get(
     `SELECT id, desc, firstDay, lastDay, startTime, endTime, dates, participants, creationTime FROM events WHERE id = ?`,
     [eventid],
