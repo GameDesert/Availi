@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#EVENT# | Respond | Availi</title>
+    <title>Respond | Availi</title>
     <link rel="stylesheet" href="respond.css">
 </head>
 
@@ -190,6 +190,15 @@
                 const type = b_or_t(JSON.parse(data.dates), date);
                 addSquare(date, type);
             }
+
+            document.title = `${data.desc} | Respond | Availi`;
+
+            const eventBlocks = document.getElementsByClassName('eventblock');
+            for (let i = 0; i < eventBlocks.length; i++) {
+                eventBlocks[i].addEventListener('click', function() {
+                    console.log(eventBlocks[i].id);
+                });
+            };
         }
 
         function main() {
