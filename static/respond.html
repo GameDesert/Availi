@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>#EVENT# | Respond | Availi</title>
+    <link rel="stylesheet" href="respond.css">
 </head>
 
 <body>
     <header>
-        <svg width="512" height="151.13829" viewBox="0 0 512 151.13829" version="1.1" id="svg1" xml:space="preserve"
+        <svg class="mainlogo" viewBox="0 0 512 151.13829" version="1.1" id="svg1" xml:space="preserve"
             xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
             <defs id="defs1" />
             <g transform="translate(1.342902,-180.03445)">
@@ -24,11 +25,98 @@
         <!-- INFO BOX -->
         <!-- EVENT TIME -->
         <!-- CALENDAR SQUARES -->
+        <div class="squares" id="calendar">
+            <div class="eventblock">
+                <p class="daytext">20 AUG</p>
+                <div class="date block">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Blocked</title>
+                        <path
+                            d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="eventblock">
+                <p class="daytext">21 AUG</p>
+                <div class="date tentative">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Tentative</title>
+                        <path
+                            d="M2,15C2,15 2,9 8,9C12,9 12.5,12.5 15.5,12.5C19.5,12.5 19.5,9 19.5,9H22C22,9 22,15 16,15C12,15 10.5,11.5 8.5,11.5C4.5,11.5 4.5,15 4.5,15H2" />
+                    </svg>
+                </div>
+            </div>
+            <div class="eventblock">
+                <p class="daytext">22 AUG</p>
+                <div class="date free">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Free</title>
+                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="eventblock">
+                <p class="daytext">23 AUG</p>
+                <div class="date disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Disabled</title>
+                        <path
+                            d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="eventblock">
+                <p class="daytext">24 AUG</p>
+                <div class="date unselected">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Unselected</title>
+                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="eventblock">
+                <p class="daytext">25 AUG</p>
+                <div class="date final">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Final</title>
+                        <path
+                            d="M14.53 1.45L13.45 2.53L15.05 4.13C15.27 4.38 15.38 4.67 15.38 5S15.27 5.64 15.05 5.86L11.5 9.47L12.5 10.55L16.13 6.94C16.66 6.35 16.92 5.7 16.92 5C16.92 4.3 16.66 3.64 16.13 3.05L14.53 1.45M10.55 3.47L9.47 4.55L10.08 5.11C10.3 5.33 10.41 5.63 10.41 6S10.3 6.67 10.08 6.89L9.47 7.45L10.55 8.53L11.11 7.92C11.64 7.33 11.91 6.69 11.91 6C11.91 5.28 11.64 4.63 11.11 4.03L10.55 3.47M21 5.06C20.31 5.06 19.67 5.33 19.08 5.86L13.45 11.5L14.53 12.5L20.11 6.94C20.36 6.69 20.66 6.56 21 6.56S21.64 6.69 21.89 6.94L22.5 7.55L23.53 6.47L22.97 5.86C22.38 5.33 21.72 5.06 21 5.06M7 8L2 22L16 17L7 8M19 11.06C18.3 11.06 17.66 11.33 17.06 11.86L15.47 13.45L16.55 14.53L18.14 12.94C18.39 12.69 18.67 12.56 19 12.56C19.33 12.56 19.63 12.69 19.88 12.94L21.5 14.53L22.55 13.5L20.95 11.86C20.36 11.33 19.7 11.06 19 11.06Z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
     </section>
     <footer>
         <!-- SUMMARY -->
         <!-- SUBMIT -->
     </footer>
+
+    <script>
+        vectors = {
+            "block": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Blocked</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>',
+            "tentative": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Tentative</title><path d="M2,15C2,15 2,9 8,9C12,9 12.5,12.5 15.5,12.5C19.5,12.5 19.5,9 19.5,9H22C22,9 22,15 16,15C12,15 10.5,11.5 8.5,11.5C4.5,11.5 4.5,15 4.5,15H2" /></svg>',
+            "free": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Free</title><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>',
+            "disabled": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Disabled</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>',
+            "unselected": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Unselected</title><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>',
+            "final": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Final</title><path d="M14.53 1.45L13.45 2.53L15.05 4.13C15.27 4.38 15.38 4.67 15.38 5S15.27 5.64 15.05 5.86L11.5 9.47L12.5 10.55L16.13 6.94C16.66 6.35 16.92 5.7 16.92 5C16.92 4.3 16.66 3.64 16.13 3.05L14.53 1.45M10.55 3.47L9.47 4.55L10.08 5.11C10.3 5.33 10.41 5.63 10.41 6S10.3 6.67 10.08 6.89L9.47 7.45L10.55 8.53L11.11 7.92C11.64 7.33 11.91 6.69 11.91 6C11.91 5.28 11.64 4.63 11.11 4.03L10.55 3.47M21 5.06C20.31 5.06 19.67 5.33 19.08 5.86L13.45 11.5L14.53 12.5L20.11 6.94C20.36 6.69 20.66 6.56 21 6.56S21.64 6.69 21.89 6.94L22.5 7.55L23.53 6.47L22.97 5.86C22.38 5.33 21.72 5.06 21 5.06M7 8L2 22L16 17L7 8M19 11.06C18.3 11.06 17.66 11.33 17.06 11.86L15.47 13.45L16.55 14.53L18.14 12.94C18.39 12.69 18.67 12.56 19 12.56C19.33 12.56 19.63 12.69 19.88 12.94L21.5 14.53L22.55 13.5L20.95 11.86C20.36 11.33 19.7 11.06 19 11.06Z" /></svg>'
+        }
+
+        date_template = `<div class="eventblock"><p class="daytext">{DAY}</p><div class="date {TYPE CLASS}">{VECTOR}</div></div>`
+
+        function formatDate(date) {
+            const options = { day: 'numeric', month: 'short' };
+            const [year, month, day] = date.split('-');
+            const formattedDate = new Date(year, month - 1, day).toLocaleDateString('en-US', options);
+            return formattedDate.replace('.', '');
+        }
+
+        function addSquare(day, type_name) {
+            const element = date_template.replace("{TYPE CLASS}", type_name).replace("{VECTOR}", vectors[type_name]).replace("{DAY}", formatDate(day));
+
+            const cal = document.getElementById('calendar');
+            cal.innerHTML += htmlText;
+        }
+    </script>
 </body>
 
 </html>

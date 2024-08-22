@@ -71,3 +71,8 @@
     fill: var(--final-out);
 }
 /* #endregion */
+
+.mainlogo {
+    width: 86px;
+    height: auto;
+}
